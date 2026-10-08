@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# Pixi (by Nicole Becher, OWASP DevSlop) as an Isoloom spec: the Node.js photo-sharing app,
+# vendored unchanged in app/, built by its own Dockerfile (app/app/), and the seeded MongoDB
+# datastore image upstream's docker-compose.yaml runs. `isoloom generate`, then `isoloom up docker`.
+version: 1
+name: pixi
+
+networks:
+  lab: { cidr: 10.60.23.0/24, internet: false }
+
+machines:
+  pixidb:
+    networks: { lab: 20 }
+    services: [{ port: 27017, name: mongodb }]
+    resources: { cpus: 1, memory_mb: 512 }
+    docker:
+      image: deadrobots/pixi:datastore@sha256:e003b0322679e206ead17ba5f0fe4f34d00f0c410dac561e1af642f4ca63f551
+
+  app:
+    networks: { lab: 10 }
+    services:
+      - { port: 8000, name: web, http: true, publish: 8000 }
+      - { port: 8090, name: api, http: true, publish: 8090 }
+    depends_on: [pixidb]
+    resources: { cpus: 1, memory_mb: 512 }
+    docker:
+      build: app/app
+
+checks:
+  - name: the web application answers
+    http: http://app:8000/login
+    wait: 180
+  - name: the API answers
+    http: http://app:8090/
+  - name: a new user registers and logs in through the API
+    script: checks/api-register-login.sh
+
+message: |
+  Pixi answers at http://localhost:{{ machines.app.services.0.publish }}/ and its API at
+  http://localhost:{{ machines.app.services.1.publish }}/. Register, log in, then look at the
+  API: the web pages, the token handling and the admin area all leak more than they should.

@@ -1,0 +1,241 @@
+{
+  "generated_by_isoloom": "from isoloom.yml; don't edit: change the spec and run `isoloom generate` (`isoloom check` fails when this file is out of date)",
+  "resolved_version": 1,
+  "name": "pixi",
+  "instance": null,
+  "inputs": [],
+  "networks": {
+    "lab": {
+      "cidr": "10.60.23.0/24",
+      "docker_cidr": "10.60.23.0/24",
+      "internet": false,
+      "gateway": null,
+      "gateway_address": "10.60.23.1",
+      "router": null,
+      "controller": "10.60.23.253"
+    }
+  },
+  "reach": [],
+  "machines": {
+    "pixidb": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.23.20"
+      },
+      "docker_addresses": {
+        "lab": "10.60.23.20"
+      },
+      "services": [
+        {
+          "port": 27017,
+          "name": "mongodb",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "app": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.23.10"
+      },
+      "docker_addresses": {
+        "lab": "10.60.23.10"
+      },
+      "services": [
+        {
+          "port": 8000,
+          "name": "web",
+          "http": true,
+          "publish": 8000
+        },
+        {
+          "port": 8090,
+          "name": "api",
+          "http": true,
+          "publish": 8090
+        }
+      ],
+      "depends_on": [
+        "pixidb"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    }
+  },
+  "start_order": [
+    "pixidb",
+    "app"
+  ],
+  "clones": {},
+  "tools": {},
+  "groups": {},
+  "router": null,
+  "controller": {
+    "addresses": {
+      "lab": "10.60.23.253"
+    }
+  },
+  "published": [
+    {
+      "machine": "app",
+      "port": 8000,
+      "host_port": 8000
+    },
+    {
+      "machine": "app",
+      "port": 8090,
+      "host_port": 8090
+    }
+  ],
+  "targets": {
+    "possible": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "generated": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "refused": {},
+    "not_possible": {
+      "hybrid": "only when some machines are containers and others are VMs",
+      "vagrant": "needs `vm:` on pixidb, app",
+      "proxmox": "needs `vm:` on pixidb, app",
+      "cloud-vm": "needs `vm:` on pixidb, app",
+      "external": "needs `external:` on pixidb, app"
+    }
+  },
+  "checks": {
+    "default_position": "networks",
+    "positions": [
+      {
+        "position": "networks",
+        "machine": null,
+        "runner": "isoloom-check",
+        "checks": [
+          {
+            "name": "the web application answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://app:8000/login",
+            "expect": "200",
+            "wait": 180
+          },
+          {
+            "name": "the API answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://app:8090/",
+            "expect": "200",
+            "wait": 30
+          },
+          {
+            "name": "a new user registers and logs in through the API",
+            "derived": false,
+            "kind": "script",
+            "target": "checks/api-register-login.sh",
+            "expect": "",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "pixidb",
+        "machine": "pixidb",
+        "runner": "isoloom-check-pixidb",
+        "checks": [
+          {
+            "name": "app:8000 from pixidb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.23.10:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "app:8090 from pixidb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.23.10:8090/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from pixidb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "app",
+        "machine": "app",
+        "runner": "isoloom-check-app",
+        "checks": [
+          {
+            "name": "pixidb:27017 from app",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.23.20:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from app",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      }
+    ]
+  },
+  "message": "Pixi answers at http://localhost:8000/ and its API at\nhttp://localhost:8090/. Register, log in, then look at the\nAPI: the web pages, the token handling and the admin area all leak more than they should.\n"
+}
