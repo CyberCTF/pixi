@@ -17,7 +17,7 @@ Upstream no longer maintains Pixi; it still runs as published.
 
 ```bash
 isoloom generate
-isoloom up docker
+isoloom run docker
 ```
 
 Then open http://localhost:8000/ (web) and http://localhost:8090/ (API). The same spec runs as
