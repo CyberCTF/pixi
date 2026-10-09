@@ -36,6 +36,8 @@ services:
           memory: 512M
     labels:
       isoloom.service.mongodb: tcp:27017
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
     restart: unless-stopped
   pixidb-routes:
     image: alpine:3.20
@@ -57,9 +59,15 @@ services:
       pixidb:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
   app:
     build:
       context: ../../app/app
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: pixi
     image: isoloom/pixi-app
     platform: linux/amd64
     hostname: app
@@ -97,6 +105,8 @@ services:
     labels:
       isoloom.service.web: http:8000
       isoloom.service.api: http:8090
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
     restart: unless-stopped
   app-routes:
     image: alpine:3.20
@@ -118,6 +128,9 @@ services:
       app:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
   isoloom-check:
     image: curlimages/curl:8.11.1
     profiles:
@@ -143,6 +156,9 @@ services:
         condition: service_healthy
       app-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
   isoloom-check-pixidb:
     image: curlimages/curl:8.11.1
     profiles:
@@ -162,6 +178,9 @@ services:
         condition: service_healthy
       app-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
   isoloom-check-app:
     image: curlimages/curl:8.11.1
     profiles:
@@ -181,6 +200,9 @@ services:
         condition: service_healthy
       app-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
   isoloom-probe-amd64:
     image: busybox:1.37.0-musl
     platform: linux/amd64
@@ -192,11 +214,20 @@ services:
     - isoloom-probe-amd64:/probe
     network_mode: none
     restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
 networks:
   lab:
     ipam:
       config:
       - subnet: 10.60.23.0/24
         gateway: 10.60.23.1
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
 volumes:
-  isoloom-probe-amd64: {}
+  isoloom-probe-amd64:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi

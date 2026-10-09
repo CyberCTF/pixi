@@ -144,7 +144,8 @@
       "vagrant": "needs `vm:` on pixidb, app",
       "proxmox": "needs `vm:` on pixidb, app",
       "cloud-vm": "needs `vm:` on pixidb, app",
-      "external": "needs `external:` on pixidb, app"
+      "external": "needs `external:` on pixidb, app",
+      "cloud-services": "left out by `targets:`"
     }
   },
   "checks": {
