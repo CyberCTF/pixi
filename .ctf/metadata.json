@@ -4,6 +4,5 @@
   "question": "Abuse the Pixi web application and API to read other users' data and reach the admin functions.",
   "category": "WEB",
   "difficulty": 2,
-  "evidence_kind": "SECRET",
-  "capabilities": ["api-security", "broken-object-level-authorization", "excessive-data-exposure", "mass-assignment", "jwt-attacks", "nosql-injection"]
+  "evidence_kind": "SECRET"
 }
