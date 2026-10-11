@@ -1,7 +1,7 @@
 {
   "title": "Pixi",
   "description": "A deliberately vulnerable photo-sharing web application and API built on Node.js, Express and MongoDB, with flaws across the OWASP API Security Top 10: excessive data exposure, broken object level authorization, mass assignment, weak JWT handling, NoSQL injection and XSS.",
-  "question": "Abuse the Pixi web application and API to read other users' data and reach the admin functions.",
+  "question": "Use the Pixi API to read other users' records, including the admin user that holds the flag.",
   "category": "WEB",
   "difficulty": 2,
   "evidence_kind": "SECRET"

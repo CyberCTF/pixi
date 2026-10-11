@@ -13,6 +13,8 @@ services:
     networks:
       lab:
         ipv4_address: 10.60.23.20
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
     healthcheck:
       test:
       - CMD
@@ -62,6 +64,25 @@ services:
     labels:
       isoloom.managed: 'true'
       isoloom.environment: pixi
+  pixidb-init-1:
+    image: deadrobots/pixi:datastore@sha256:e003b0322679e206ead17ba5f0fe4f34d00f0c410dac561e1af642f4ca63f551
+    entrypoint:
+    - /bin/sh
+    - /isoloom/init/flag.sh
+    volumes:
+    - ../../ctf/flag.sh:/isoloom/init/flag.sh:ro
+    network_mode: service:pixidb
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
+    depends_on:
+      pixidb:
+        condition: service_healthy
+      pixidb-routes:
+        condition: service_healthy
+    restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: pixi
   app:
     build:
       context: ../../app/app
@@ -95,6 +116,8 @@ services:
         condition: service_completed_successfully
       pixidb:
         condition: service_healthy
+      pixidb-init-1:
+        condition: service_completed_successfully
       pixidb-routes:
         condition: service_healthy
     deploy:
@@ -150,6 +173,8 @@ services:
     depends_on:
       pixidb:
         condition: service_healthy
+      pixidb-init-1:
+        condition: service_completed_successfully
       pixidb-routes:
         condition: service_healthy
       app:
@@ -172,6 +197,8 @@ services:
     depends_on:
       pixidb:
         condition: service_healthy
+      pixidb-init-1:
+        condition: service_completed_successfully
       pixidb-routes:
         condition: service_healthy
       app:
@@ -194,6 +221,8 @@ services:
     depends_on:
       pixidb:
         condition: service_healthy
+      pixidb-init-1:
+        condition: service_completed_successfully
       pixidb-routes:
         condition: service_healthy
       app:

@@ -1,0 +1,41 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Read the flag",
+      "prompt": "Register on Pixi and use its API to read the records of other users. An admin user, Flag Keeper, has the flag in its record.",
+      "check": { "evidence": "SECRET", "format": "FLAG{%s}" },
+      "dev": "FLAG{dev-pixi}",
+      "hints": [
+        "Log in through the API and keep the token it hands out: every endpoint takes it in the x-access-token header.",
+        "Some endpoints meant for administrators only check that you have a token, not who you are."
+      ],
+      "steps": [
+        {
+          "key": "token",
+          "title": "Get a token",
+          "prompt": "Which request header carries the API token?",
+          "check": { "answer": ["x-access-token"] }
+        },
+        {
+          "key": "endpoint",
+          "title": "Find the endpoint",
+          "prompt": "Which admin endpoint returns every user's record? (its path)",
+          "check": { "answer": ["/api/admin/all_users", "api/admin/all_users"] }
+        },
+        {
+          "key": "class",
+          "title": "Name the flaw",
+          "prompt": "Which OWASP API Security Top 10 risk is a regular user calling an admin function? (its name)",
+          "check": { "answer": ["broken function level authorization", "bfla", "broken function level authorisation"] }
+        },
+        {
+          "key": "exposure",
+          "title": "Name the second flaw",
+          "prompt": "The records come back with every field, password included. Which API risk is that? (its name)",
+          "check": { "answer": ["excessive data exposure", "broken object property level authorization", "bopla"] }
+        }
+      ]
+    }
+  ]
+}

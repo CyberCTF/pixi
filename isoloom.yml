@@ -5,6 +5,9 @@
 version: 1
 name: pixi
 
+# Given by the CyberCTF launcher: this player's flag. Without it the development flag.
+inputs: [CTF_FLAG_MAIN]
+
 networks:
   lab: { cidr: 10.60.23.0/24, internet: false }
 
@@ -13,8 +16,10 @@ machines:
     networks: { lab: 20 }
     services: [{ port: 27017, name: mongodb }]
     resources: { cpus: 1, memory_mb: 512 }
+    inputs: [CTF_FLAG_MAIN]
     docker:
       image: deadrobots/pixi:datastore@sha256:e003b0322679e206ead17ba5f0fe4f34d00f0c410dac561e1af642f4ca63f551
+      init: [ctf/flag.sh]
 
   app:
     networks: { lab: 10 }
